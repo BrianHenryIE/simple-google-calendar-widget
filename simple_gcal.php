@@ -175,7 +175,7 @@ class Simple_Gcal_Widget extends WP_Widget
           <input class="widefat" id="<?php echo $this->get_field_id('cache_time'); ?>" name="<?php echo $this->get_field_name('cache_time'); ?>" type="text" value="<?php echo attribute_escape($instance['cache_time']); ?>" />
         </p>
         <p>
-            <?php _e('Need <a href="http://nicoboehr.de/wordpress.html" target="_blank">help</a>?', 'simple_gcal'); ?>
+            <?php _e('Need <a href="http://wordpress.org/extend/plugins/simple-google-calendar-widget/" target="_blank">help</a>?', 'simple_gcal'); ?>
         </p>
         <?php
     }
