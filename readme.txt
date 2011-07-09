@@ -12,10 +12,6 @@ Google offers some HTML snippets to embed your public Google Calendar into your 
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
 1. Do the usual setup procedure... you know... downloading... unpacking... uploading... activating. Or just install it through the wordpress plugin directory.
 2. As soon as you activated the plugin, you should see a new widget under Design › Widgets. Just drag it into your sidebar.
 3. Fill out all the necessary configuration fields. Under Calendar ID enter the calendar ID displayed by Google Calendar. You can find it by going to Calendar settings › Calendars, clicking on the appropriate calendar, scrolling all the way down to "Calendar address". There’s your calendar id.
