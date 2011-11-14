@@ -23,7 +23,7 @@ class Simple_Gcal_Widget extends WP_Widget
     
     private function getCalendarUrl($calId, $count)
     {
-        return 'https://www.google.com/calendar/feeds/'.$calId.'/public/full?orderby=starttime&sortorder=ascending&max-results='. $count . '&futureevents=true';
+        return 'https://www.google.com/calendar/feeds/'.$calId.'/public/full?orderby=starttime&sortorder=ascending&max-results='. $count . '&futureevents=true&singleevents=true';
     }
     
     private function getData($instance)
