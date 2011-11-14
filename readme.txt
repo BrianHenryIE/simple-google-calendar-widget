@@ -21,3 +21,6 @@ Google offers some HTML snippets to embed your public Google Calendar into your 
 
 = 0.1 =
 * First release.
+
+= 0.2 =
+* Fix a bug with recurring events, thanks Atur for reporting

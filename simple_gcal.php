@@ -3,7 +3,7 @@
 Plugin Name: Simple Google Calendar Widget
 Description: Widget that displays events from a public google calendar
 Author: Nico Boehr
-Version: 0.1
+Version: 0.2
 */
 class Simple_Gcal_Widget extends WP_Widget 
 {
