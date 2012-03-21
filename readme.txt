@@ -1,7 +1,8 @@
 === Simple Google Calendar Widget ===
 Tags: google calendar, google, calendar, widget
 Requires at least: 3.1
-Tested up to: 3.2
+Contributors: pemrich
+Tested up to: 3.3.1
 Stable tag: trunk
 
 Displays events from a public Google Calendar as a sidebar widget.
@@ -16,6 +17,11 @@ Google offers some HTML snippets to embed your public Google Calendar into your 
 2. As soon as you activated the plugin, you should see a new widget under Design › Widgets. Just drag it into your sidebar.
 3. Fill out all the necessary configuration fields. Under Calendar ID enter the calendar ID displayed by Google Calendar. You can find it by going to Calendar settings › Calendars, clicking on the appropriate calendar, scrolling all the way down to "Calendar address". There’s your calendar id.
 4. You’re done!
+
+== License ==
+The plugin is published under the GPL v3. Previous versions (<= 0.2) did not
+mention a license; this has been fixed in the latest trunk and will be
+included in the next release version.
 
 == Changelog ==
 
