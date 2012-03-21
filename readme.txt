@@ -1,7 +1,7 @@
 === Simple Google Calendar Widget ===
 Tags: google calendar, google, calendar, widget
 Requires at least: 3.1
-Contributors: pemrich
+Contributors: pemrich, nboehr
 Tested up to: 3.3.1
 Stable tag: trunk
 
