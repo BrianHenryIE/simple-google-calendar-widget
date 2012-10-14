@@ -30,3 +30,6 @@ included in the next release version.
 
 = 0.2 =
 * Fix a bug with recurring events, thanks Atur for reporting
+
+= 0.3 =
+* Fix possible Fatal Error when adding the widget to the sidebar, thanks pwndrian for reporting and larcher for the suggested fix.

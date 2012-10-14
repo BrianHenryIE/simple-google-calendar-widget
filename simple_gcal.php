@@ -3,7 +3,7 @@
 Plugin Name: Simple Google Calendar Widget
 Description: Widget that displays events from a public google calendar
 Author: Nico Boehr
-Version: 0.2
+Version: 0.3
 License: GPL3
 */
 
@@ -70,7 +70,8 @@ class Simple_Gcal_Widget extends WP_Widget
         $url = $this->getCalendarUrl($calId, $count);
         $httpData = wp_remote_get($url);
         
-        if(!$httpData) {
+        if(is_wp_error($httpData) || !is_array($httpData)) {
+            echo 'Simple Google Calendar: ', $httpData->get_error_message();
             return false;
         }
         
