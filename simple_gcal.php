@@ -3,7 +3,7 @@
 Plugin Name: Simple Google Calendar Widget
 Description: Widget that displays events from a public google calendar
 Author: Nico Boehr
-Version: 0.3
+Version: 0.4
 License: GPL3
 */
 
