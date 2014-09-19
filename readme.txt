@@ -2,7 +2,7 @@
 Tags: google calendar, google, calendar, widget
 Requires at least: 3.1
 Contributors: pemrich, nboehr
-Tested up to: 3.3.1
+Tested up to: 4.0
 Stable tag: trunk
 
 Displays events from a public Google Calendar as a sidebar widget.
@@ -33,3 +33,6 @@ included in the next release version.
 
 = 0.3 =
 * Fix possible Fatal Error when adding the widget to the sidebar, thanks pwndrian for reporting and larcher for the suggested fix.
+
+= 0.4 =
+* The plugin now respects the time zone set for your wordpress instance (Settings > General > Time Zone).

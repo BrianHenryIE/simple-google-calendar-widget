@@ -118,6 +118,7 @@ class Simple_Gcal_Widget extends WP_Widget
         }
         
         $data = $this->getData($instance);
+        date_default_timezone_set(get_option('timezone_string'));
         echo '<ol class="eventlist">';
         foreach($data as $e) {
             echo '<li><span class="date">', strftime(__('<span class="day">%d</span>%b', 'simple_gcal'), $e->from), '</span>';
@@ -132,6 +133,7 @@ class Simple_Gcal_Widget extends WP_Widget
             echo '</li>';
         }
         echo '</ol>';
+        date_default_timezone_set('UTC');
         echo '<br class="clear" />';
         echo $args['after_widget']; 
     }
