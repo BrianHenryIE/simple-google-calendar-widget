@@ -2,8 +2,8 @@
 /*
 Plugin Name: Simple Google Calendar Widget
 Description: Widget that displays events from a public google calendar
-Author: Nico Boehr
-Version: 0.4
+Author: Nico Boehr, Brian Henry
+Version: 0.5
 License: GPL3
 */
 
@@ -25,6 +25,9 @@ License: GPL3
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+
+
 class Simple_Gcal_Widget extends WP_Widget 
 {
     
@@ -40,12 +43,7 @@ class Simple_Gcal_Widget extends WP_Widget
     {
         return 'wp_gcal_widget_'.$this->id;
     }
-    
-    private function getCalendarUrl($calId, $count)
-    {
-        return 'https://www.google.com/calendar/feeds/'.$calId.'/public/full?orderby=starttime&sortorder=ascending&max-results='. $count . '&futureevents=true&singleevents=true';
-    }
-    
+
     private function getData($instance)
     {
         $widgetId = $this->id;
@@ -53,7 +51,7 @@ class Simple_Gcal_Widget extends WP_Widget
         $transientId = $this->getTransientId();
         
         if(false === ($data = get_transient($transientId))) {
-            $data = $this->fetch($calId, $instance['event_count']);
+            $data = $this->fetch($instance);
             set_transient($transientId, $data, $instance['cache_time']*60);
         }
         
@@ -65,47 +63,68 @@ class Simple_Gcal_Widget extends WP_Widget
         return delete_transient($this->getTransientId());
     }
     
-    private function fetch($calId, $count)
-    {
-        $url = $this->getCalendarUrl($calId, $count);
-        $httpData = wp_remote_get($url);
-        
-        if(is_wp_error($httpData) || !is_array($httpData)) {
-            echo 'Simple Google Calendar: ', $httpData->get_error_message();
-            return false;
+    private function fetch($instance){
+
+        require_once realpath(dirname(__FILE__) . '/google-api-php-client/autoload.php');
+
+        session_start();
+
+        $client = new Google_Client();
+
+        $client->setApplicationName($instance['application_name']);
+
+        $service = new Google_Service_Calendar($client);
+
+        if (isset($_SESSION['service_token'])) {
+            $client->setAccessToken($_SESSION['service_token']);
         }
-        
-        $xml = new SimpleXmlElement($httpData['body']);
-        
-        if(!$xml) {
-            return false;
+
+        $key = file_get_contents(dirname(__FILE__) . '/' . $instance['key_file_location']);
+
+        $cred = new Google_Auth_AssertionCredentials(
+            $instance['service_account_name'],
+            array('https://www.googleapis.com/auth/calendar'),
+            $key
+        );
+
+        $client->setAssertionCredentials($cred);
+
+        if ($client->getAuth()->isAccessTokenExpired()) {
+            $client->getAuth()->refreshTokenWithAssertion($cred);
         }
-        
+
+        $_SESSION['service_token'] = $client->getAccessToken();
+
+        $optParams = array( 'maxResults'=>$instance['event_count'] );
+
+        $events = $service->events->listEvents($instance['calendar_id'], $optParams);
+
         $out = array();
         $i = 0;
-        foreach($xml->entry as $e)
-        {
-       
-            $gd = $e->children('http://schemas.google.com/g/2005');
-            $out[$i] = new StdClass;
-            $when = $gd->when->attributes();
-            $where = $gd->where->attributes();
-            $out[$i]->title = (string)$e->title;
-            $out[$i]->from = strtotime((string)$when->startTime);
-            $out[$i]->to = strtotime((string)$when->endTime);
-            $out[$i]->where = (string)$where->valueString;
-            foreach($e->link as $l) {
-                $type = $l->attributes()->type;
-                $href = $l->attributes()->href;
-                if($type == 'text/html') {
-                    $out[$i]->htmlLink = (string)$href;
-                    break;
-                }
+
+        while(true) {
+            foreach ($events->getItems() as $event) {
+
+                $out[$i] = new StdClass;
+
+                $out[$i]->title = $event->getSummary();
+                $out[$i]->from = $event->getStart()->dateTime;
+                $out[$i]->to = $event->getEnd()->dateTime;
+                $out[$i]->where = $event->getLocation();
+                $out[$i]->description = $event->getDescription();
+                $out[$i]->htmlLink = $event->getHtmlLink();
+
+                $i++;
             }
-            $i++;
-            
+            $pageToken = $events->getNextPageToken();
+            if ($pageToken) {
+                $optParams = array('pageToken' => $pageToken);
+                $events = $service->events->listEvents('primary', $optParams);
+            } else {
+                break;
+            }
         }
-        
+
         return $out;
     }
 
@@ -145,6 +164,14 @@ class Simple_Gcal_Widget extends WP_Widget
         
         $instance['calendar_id'] = htmlspecialchars($new_instance['calendar_id']);
         
+        $instance['application_name'] =  htmlspecialchars($new_instance['application_name']);
+
+        $instance['client_id'] =  htmlspecialchars($new_instance['client_id']);
+
+        $instance['service_account_name'] =  htmlspecialchars($new_instance['service_account_name']);
+
+        $instance['key_file_location'] =  htmlspecialchars($new_instance['key_file_location']);
+
         $instance['targetblank'] = $new_instance['targetblank']==1?1:0;
         
         $instance['cache_time'] = $new_instance['cache_time'];
@@ -184,6 +211,25 @@ class Simple_Gcal_Widget extends WP_Widget
           <label for="<?php echo $this->get_field_id('calendar_id'); ?>"><?php _e('Calendar ID:', 'simple_gcal'); ?></label> 
           <input class="widefat" id="<?php echo $this->get_field_id('calendar_id'); ?>" name="<?php echo $this->get_field_name('calendar_id'); ?>" type="text" value="<?php echo attribute_escape($instance['calendar_id']); ?>" />
         </p>
+
+        <p><a taget="_parent" href="https://console.developers.google.com/project/">Google API Settings</a></p>
+        <p>
+            <label for="<?php echo $this->get_field_id('application_name'); ?>"><?php _e('Application Name:', 'simple_gcal'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('application_name'); ?>" name="<?php echo $this->get_field_name('application_name'); ?>" type="text" value="<?php echo attribute_escape($instance['application_name']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('client_id'); ?>"><?php _e('Client ID:', 'simple_gcal'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('client_id'); ?>" name="<?php echo $this->get_field_name('client_id'); ?>" type="text" value="<?php echo attribute_escape($instance['client_id']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('service_account_name'); ?>"><?php _e('Service Account Name/Email Address:', 'simple_gcal'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('service_account_name'); ?>" name="<?php echo $this->get_field_name('service_account_name'); ?>" type="text" value="<?php echo attribute_escape($instance['service_account_name']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('key_file_location'); ?>"><?php _e('.p12 Key File Location:', 'simple_gcal'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('key_file_location'); ?>" name="<?php echo $this->get_field_name('key_file_location'); ?>" type="text" value="<?php echo attribute_escape($instance['key_file_location']); ?>" />
+        </p>
+
         <p>
           <label for="<?php echo $this->get_field_id('targetblank'); ?>"><?php _e('Open event details in new window:', 'simple_gcal'); ?></label> 
           <input name="<?php echo $this->get_field_name('targetblank'); ?>" type="hidden" value="0" />
