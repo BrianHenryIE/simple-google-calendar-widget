@@ -67,7 +67,9 @@ class Simple_Gcal_Widget extends WP_Widget
 
         require_once realpath(dirname(__FILE__) . '/google-api-php-client/autoload.php');
 
-        session_start();
+        if( !session_id() ) {
+            session_start();
+        }
 
         $client = new Google_Client();
 
@@ -140,7 +142,9 @@ class Simple_Gcal_Widget extends WP_Widget
         date_default_timezone_set(get_option('timezone_string'));
         echo '<ol class="eventlist">';
         foreach($data as $e) {
-            echo '<li><span class="date">', strftime(__('<span class="day">%d</span>%b', 'simple_gcal'), $e->from), '</span>';
+// echo '<li><span class="date">', strftime(__('<span class="day">%d</span>%b', 'simple_gcal'), $e->from), '</span>';
+            echo '<li><span class="date">'.date('l, jS F',  strtotime($e->from)).'</span>';
+            
             echo '<a href="', htmlspecialchars($e->htmlLink),'" class="eventlink" ';
             if($instance['targetblank']) {
                 echo 'target="_blank" ';
