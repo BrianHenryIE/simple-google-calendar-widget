@@ -97,7 +97,7 @@ class Simple_Gcal_Widget extends WP_Widget
 
         $_SESSION['service_token'] = $client->getAccessToken();
 
-        $optParams = array( 'maxResults'=>$instance['event_count'] );
+        $optParams = array( 'maxResults'=>$instance['event_count'], 'timeMin'=>date("c"), 'orderBy'=>'startTime', 'singleEvents'=>true);
 
         $events = $service->events->listEvents($instance['calendar_id'], $optParams);
 
@@ -144,7 +144,7 @@ class Simple_Gcal_Widget extends WP_Widget
         foreach($data as $e) {
 // echo '<li><span class="date">', strftime(__('<span class="day">%d</span>%b', 'simple_gcal'), $e->from), '</span>';
             echo '<li><span class="date">'.date('l, jS F',  strtotime($e->from)).'</span>';
-            
+
             echo '<a href="', htmlspecialchars($e->htmlLink),'" class="eventlink" ';
             if($instance['targetblank']) {
                 echo 'target="_blank" ';
