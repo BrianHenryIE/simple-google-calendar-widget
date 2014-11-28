@@ -110,7 +110,13 @@ class Simple_Gcal_Widget extends WP_Widget
                 $out[$i] = new StdClass;
 
                 $out[$i]->title = $event->getSummary();
-                $out[$i]->from = $event->getStart()->dateTime;
+                if($out[$i]->from = $event->getStart()->dateTime!=null){
+                    $out[$i]->from = $event->getStart()->dateTime;
+                    $out[$i]->allday = false;
+                }else{
+                    $out[$i]->from = $event->getStart()->date;
+                    $out[$i]->allday = true;
+                }
                 $out[$i]->to = $event->getEnd()->dateTime;
                 $out[$i]->where = $event->getLocation();
                 $out[$i]->description = $event->getDescription();
